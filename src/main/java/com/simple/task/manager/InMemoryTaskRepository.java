@@ -14,10 +14,16 @@ public class InMemoryTaskRepository {
     private final AtomicLong counter = new AtomicLong();
 
     public Task save(Task task) {
-        if (task.getId() == null) {
-            task.setId(counter.incrementAndGet());
+        // ensure they gave you a status
+        if (task.getStatus() == null) {
+            throw new IllegalArgumentException("Status must be PENDING or COMPLETED");
         }
-        tasks.put(task.getId(), task);
+
+        // always generate a fresh id server-side
+        long newId = counter.incrementAndGet();
+        task.setId(newId);
+
+        tasks.put(newId, task);
         return task;
     }
 
